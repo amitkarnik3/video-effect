@@ -309,24 +309,22 @@
 					return false;
 				}, true);
 
+
+				function captureCamera(callback) {
+					navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(function (camera) {
+						callback(camera);
+					}).catch(function (error) {
+						alert('Unable to capture your camera. Please check console logs.');
+						console.error(error);
+					});
+				}
+
 				gUM && document.getElementById('camera').addEventListener('click', function () {
-					gUM.call(navigator, { video: true, audio: true }, function (stream) {
-						function resize() {
-							target.height = video.videoHeight;
-							target.width = video.videoWidth;
-						}
-
-						if (window.webkitURL) {
-							video.src = window.webkitURL.createObjectURL(stream);
-						} else {
-							video.src = stream;
-						}
-
-						webCamStream = stream;
-
+					captureCamera(function (camera) {
 						video.muted = true;
 						video.volume = 0;
 						video.srcObject = camera;
+
 						recorder = RecordRTC(camera, {
 							type: 'video'
 						});
@@ -335,13 +333,9 @@
 
 						// release camera on stopRecording
 						recorder.camera = camera;
+						webCamStream = camera;
 
 
-						video.play();
-						if (video.videoWidth) {
-							resize();
-						}
-						video.onloadedmetadata = video.onplay = resize;
 						source.source = video;
 					}, function () {
 						console.log('getUserMedia failed');
