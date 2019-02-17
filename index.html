@@ -322,6 +322,12 @@
 
 				gUM && document.getElementById('camera').addEventListener('click', function () {
 					captureCamera(function (camera) {
+
+						function resize() {
+							target.height = video.videoHeight;
+							target.width = video.videoWidth;
+						}
+
 						video.muted = true;
 						video.volume = 0;
 						video.srcObject = camera;
@@ -335,7 +341,11 @@
 						// release camera on stopRecording
 						recorder.camera = camera;
 						webCamStream = camera;
-
+						video.play();
+						if (video.videoWidth) {
+							resize();
+						}
+						video.onloadedmetadata = video.onplay = resize;
 
 						source.source = video;
 					}, function () {
